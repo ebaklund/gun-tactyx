@@ -28,8 +28,10 @@
 *
 ********************************************************************************************/
 
+#include <iostream>
 #include <raylib.h>
-#include "zip_access.hpp"
+#include "zip_reader.hpp"
+#include "mdx_reader.hpp"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -39,7 +41,17 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
 
-    zip_access::ZipRAII assets("../assets/GUN-TACTYX.dat");
+    ZipReader assets("../assets/GUN-TACTYX.dat");
+    auto asset_names = assets.get_file_names();
+
+    std::cout << "Asset names:\n";
+    for (const auto& name : *asset_names)
+        std::cout << name << "\n";
+
+    auto gun = assets.fread("gun.mdx");
+    std::cout << std::format("gun.mdx contains {} bytes.\n", gun.size());
+
+    do_mdx(gun);
 
     const int screenWidth = 1600;
     const int screenHeight = 900;
