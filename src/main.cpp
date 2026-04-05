@@ -28,7 +28,8 @@
 *
 ********************************************************************************************/
 
-#include "raylib.h"
+#include <raylib.h>
+#include "zip_access.hpp"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -37,6 +38,9 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
+
+    zip_access::ZipRAII assets("../assets/GUN-TACTYX.dat");
+
     const int screenWidth = 1600;
     const int screenHeight = 900;
 
