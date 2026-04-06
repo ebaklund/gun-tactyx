@@ -48,10 +48,8 @@ int main(void)
     for (const auto& name : *asset_names)
         std::cout << name << "\n";
 
-    auto gun = assets.fread("gun.mdx");
-    std::cout << std::format("gun.mdx contains {} bytes.\n", gun.size());
-
-    do_mdx(gun);
+    auto gun_data = assets.fread("gun.mdx");
+    auto gun_model = MdxReader::read_mdx_model(gun_data);
 
     const int screenWidth = 1600;
     const int screenHeight = 900;

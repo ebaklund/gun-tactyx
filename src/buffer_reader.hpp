@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <cstring>
 
 class BufferReader
 {
@@ -12,6 +13,11 @@ private:
     const uint8_t* _end;
 
 public:
+
+    int bytes_left() {
+        return _end - _p;
+    }
+
     BufferReader(const uint8_t* begin, size_t size)
     {
         _p = begin;
@@ -44,6 +50,20 @@ public:
     }
 
     template<typename T>
+    bool read_next(std::vector<T>& out)
+    {
+        int size = out.size() * sizeof(T);
+
+        if ((_end - _p) < size)
+            return false;
+
+        std::memcpy(out.data(), _p, size);
+        _p += size;
+
+        return true;
+    }
+
+    template<typename T>
     bool read_next_or_throw(T* out)
     {
         if (!read_next(out))
@@ -55,6 +75,15 @@ public:
     bool read_next_or_throw(std::string& out, int len)
     {
         if (!read_next(out, len))
+            throw std::runtime_error("read_next_or_throw() failed.");
+
+        return true;
+    }
+
+    template<typename T>
+    bool read_next_or_throw(std::vector<T>& out)
+    {
+        if (!read_next(out))
             throw std::runtime_error("read_next_or_throw() failed.");
 
         return true;
