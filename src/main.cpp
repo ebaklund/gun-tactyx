@@ -42,12 +42,15 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
 
-    nyx::RaylibModelLoader nyx_model_loader("../assets/GUN-TACTYX.dat");
-
-    Model gun_model;
-    nyx_model_loader.load(gun_model, "gun.mdx", "gun.jpg");
-
     nyx::ZipReader zip_reader("../assets/GUN-TACTYX.dat");
+    nyx::RaylibModelLoader raylib_model_loader(zip_reader);
+    Model raylib_gun_model;
+    raylib_model_loader.load("gun.mdx", "gun.jpg", raylib_gun_model);
+
+    nyx::MdxModelLoader mdx_model_loader(zip_reader);
+    nyx::MdxModel gun_model;
+    mdx_model_loader.load("gun.mdx", "gun.jpg", gun_model);
+
     auto asset_names = zip_reader.get_file_names();
 
     std::cout << "Asset names:\n";
@@ -132,9 +135,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     UnloadTexture(texture);     // Unload texture
     UnloadModel(model);         // Unload model
-
     CloseWindow();              // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
-
     return 0;
 }

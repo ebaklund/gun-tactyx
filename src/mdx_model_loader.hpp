@@ -10,7 +10,7 @@ namespace nyx
     class MdxModelLoader
     {
     private:
-        ZipReader _zip_reader;
+        ZipReader& _zip_reader;
 
         static void load_model(MdxModel& mdx_model, const std::vector<uint8_t>& buff)
         {
@@ -26,15 +26,29 @@ namespace nyx
             reader.read_next_or_throw(&num_meshes);
             reader.read_next_or_throw(&num_animations);
 
+            std::cout << std::format("---> Num frames: {}\n", mdx_model.bone.frame_count);
+            std::cout << std::format("---> Num tags: {}\n", num_tags);
+            std::cout << std::format("---> Num meshes: {}\n", num_meshes);
+            std::cout << std::format("---> Num animations: {}\n", num_animations);
+            std::cout << "---\n";
+
             mdx_model.bone.animations.resize(num_animations);
             reader.read_next_or_throw(mdx_model.bone.animations);
 
             mdx_model.link_names.resize(num_tags);
             for (std::string& name : mdx_model.link_names)
+            {
                 reader.read_next_or_throw(name, 16);
+                std::cout << std::format("---> {}\n", name);
+            }
 
-            mdx_model.bone.transforms.resize(mdx_model.bone.frame_count * num_tags);
+            std::cout << "---\n";
+
+            int num_transforms = mdx_model.bone.frame_count * num_tags;
+            mdx_model.bone.transforms.resize(num_transforms);
             reader.read_next_or_throw(mdx_model.bone.transforms);
+
+            std::cout << std::format("---> Num transforms: {}\n", num_transforms);
 
             mdx_model.bone.meshes.resize(num_meshes);
             for (MdxMesh& mesh : mdx_model.bone.meshes) {
@@ -46,6 +60,11 @@ namespace nyx
                 reader.read_next_or_throw(&num_triangles);
                 reader.read_next_or_throw(&num_tex_coords);
                 int32_t num_vertices = num_tex_coords * num_frames;
+
+                std::cout << std::format("---> Num frames: {}\n", num_frames);
+                std::cout << std::format("---> Num triangles: {}\n", num_triangles);
+                std::cout << std::format("---> Num tex coords: {}\n", num_tex_coords);
+                std::cout << std::format("---> Num vertices: {}\n", num_vertices);
 
                 mesh.triangles.resize(num_triangles);
                 mesh.tex_coords.resize(num_tex_coords);
@@ -63,10 +82,10 @@ namespace nyx
         }
 
     public:
-        MdxModelLoader(std::string zip_path) : _zip_reader(zip_path) {
+        MdxModelLoader(ZipReader& zip_reader) : _zip_reader(zip_reader) {
         }
 
-        void load(MdxModel& mdx_model, const std::string& model_name, const std::string& skin_name) {
+        void load(const std::string& model_name, const std::string& skin_name, MdxModel& mdx_model) {
             std::vector<uint8_t> model_data = _zip_reader.fread(model_name);
             std::vector<uint8_t> skin_data = _zip_reader.fread(skin_name);
 

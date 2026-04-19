@@ -8,15 +8,18 @@ namespace nyx
     class RaylibModelLoader
     {
     private:
+        ZipReader& _zip_reader;
         MdxModelLoader _mdx_model_loader;
 
     public:
-        RaylibModelLoader(std::string zip_path) : _mdx_model_loader(zip_path) {
+        RaylibModelLoader(ZipReader& zip_reader)
+        :   _zip_reader(zip_reader),
+            _mdx_model_loader(zip_reader) {
         }
 
-        void load(Model& raylib_model, const std::string& model_name, const std::string& skin_name) {
+        void load(const std::string& model_name, const std::string& skin_name, Model& raylib_model) {
             MdxModel mdx_model;
-            _mdx_model_loader.load(mdx_model, model_name, skin_name);
+            _mdx_model_loader.load(model_name, skin_name, mdx_model);
         }
     };
 }
