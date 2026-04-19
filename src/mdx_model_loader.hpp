@@ -3,6 +3,7 @@
 
 #include <string>
 #include "buffer_reader.hpp"
+#include "mdx_model.hpp"
 
 
 namespace nyx

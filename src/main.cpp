@@ -31,7 +31,7 @@
 #include <iostream>
 #include <raylib-cpp.hpp>
 #include "zip_reader.hpp"
-#include "mdx_to_raylib.hpp"
+#include "mdx_model_loader.hpp"
 #include "raylib_model_loader.hpp"
 
 //------------------------------------------------------------------------------------
