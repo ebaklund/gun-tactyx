@@ -8,7 +8,7 @@
 #include <vector>
 #include <memory>
 
-namespace nyx
+namespace nyx::dat
 {
     class ZipException : public std::runtime_error
     {

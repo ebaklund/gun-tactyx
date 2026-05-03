@@ -30,8 +30,9 @@
 
 #include <iostream>
 #include <raylib-cpp.hpp>
-#include "zip_reader.hpp"
-#include "mdx_model_loader.hpp"
+#include "dat/zip_reader.hpp"
+#include "dat/mdx_loader.hpp"
+#include "dat/mdl_loader.hpp"
 #include "raylib_model_loader.hpp"
 
 //------------------------------------------------------------------------------------
@@ -42,14 +43,18 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
 
-    nyx::ZipReader zip_reader("../assets/GUN-TACTYX.dat");
+    nyx::dat::ZipReader zip_reader("../assets/GUN-TACTYX.dat");
     nyx::RaylibModelLoader raylib_model_loader(zip_reader);
     Model raylib_gun_model;
     raylib_model_loader.load("gun.mdx", "gun.jpg", raylib_gun_model);
 
-    nyx::MdxModelLoader mdx_model_loader(zip_reader);
-    nyx::MdxModel gun_model;
-    mdx_model_loader.load("gun.mdx", "gun.jpg", gun_model);
+    nyx::dat::MdxLoader mdx_loader(zip_reader);
+    nyx::dat::MdxBone gun_model;
+    mdx_loader.load("gun.mdx", "gun.jpg", gun_model);
+
+    nyx::dat::MdlLoader mdl_loader(zip_reader);
+    nyx::dat::MdlContent mdl_content;
+    mdl_loader.load("warrior.mdl", mdl_content);
 
     auto asset_names = zip_reader.get_file_names();
 

@@ -3,21 +3,21 @@
 
 #include <string>
 #include "buffer_reader.hpp"
-#include "mdx_model.hpp"
+#include "mdx_bone.hpp"
 
 
-namespace nyx
+namespace nyx::dat
 {
-    class MdxModelLoader
+    class MdxLoader
     {
     private:
         ZipReader& _zip_reader;
 
-        static void load_model(MdxModel& mdx_model, const std::vector<uint8_t>& buff)
+        static void load_model(MdxBone& mdx_bone, const std::vector<uint8_t>& buff)
         {
             BufferReader reader(buff.data(), buff.size());
 
-            reader.read_next_or_throw(&mdx_model.bone.frame_count);
+            reader.read_next_or_throw(&mdx_bone.frame_count);
 
             int32_t num_tags;
             int32_t num_meshes;
@@ -27,17 +27,17 @@ namespace nyx
             reader.read_next_or_throw(&num_meshes);
             reader.read_next_or_throw(&num_animations);
 
-            std::cout << std::format("---> Num frames: {}\n", mdx_model.bone.frame_count);
+            std::cout << std::format("---> Num frames: {}\n", mdx_bone.frame_count);
             std::cout << std::format("---> Num tags: {}\n", num_tags);
             std::cout << std::format("---> Num meshes: {}\n", num_meshes);
             std::cout << std::format("---> Num animations: {}\n", num_animations);
             std::cout << "---\n";
 
-            mdx_model.bone.animations.resize(num_animations);
-            reader.read_next_or_throw(mdx_model.bone.animations);
+            mdx_bone.animations.resize(num_animations);
+            reader.read_next_or_throw(mdx_bone.animations);
 
-            mdx_model.link_names.resize(num_tags);
-            for (std::string& name : mdx_model.link_names)
+            mdx_bone.link_names.resize(num_tags);
+            for (std::string& name : mdx_bone.link_names)
             {
                 reader.read_next_or_throw(name, 16);
                 std::cout << std::format("---> {}\n", name);
@@ -45,14 +45,14 @@ namespace nyx
 
             std::cout << "---\n";
 
-            int num_transforms = mdx_model.bone.frame_count * num_tags;
-            mdx_model.bone.transforms.resize(num_transforms);
-            reader.read_next_or_throw(mdx_model.bone.transforms);
+            int num_transforms = mdx_bone.frame_count * num_tags;
+            mdx_bone.transforms.resize(num_transforms);
+            reader.read_next_or_throw(mdx_bone.transforms);
 
             std::cout << std::format("---> Num transforms: {}\n", num_transforms);
 
-            mdx_model.bone.meshes.resize(num_meshes);
-            for (MdxMesh& mesh : mdx_model.bone.meshes) {
+            mdx_bone.meshes.resize(num_meshes);
+            for (MdxMesh& mesh : mdx_bone.meshes) {
                 int32_t num_frames;
                 int32_t num_triangles;
                 int32_t num_tex_coords;
@@ -83,14 +83,14 @@ namespace nyx
         }
 
     public:
-        MdxModelLoader(ZipReader& zip_reader) : _zip_reader(zip_reader) {
+        MdxLoader(ZipReader& zip_reader) : _zip_reader(zip_reader) {
         }
 
-        void load(const std::string& model_name, const std::string& skin_name, MdxModel& mdx_model) {
-            std::vector<uint8_t> model_data = _zip_reader.fread(model_name);
+        void load(const std::string& bone_name, const std::string& skin_name, MdxBone& mdx_bone) {
+            std::vector<uint8_t> bone_data = _zip_reader.fread(bone_name);
             std::vector<uint8_t> skin_data = _zip_reader.fread(skin_name);
 
-            load_model(mdx_model, model_data);
+            load_model(mdx_bone, bone_data);
         }
     };
 }
